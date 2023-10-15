@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 
 @RestController
@@ -24,6 +25,11 @@ public class UserController {
             //retorna um status de erro e uma mensagem para a requisição.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe!");
         }
+
+        //recebe a senha do usuário e passa por uma criptografia antes de salvar, salva em um arryadeChar.
+        var passwordHashred =  BCrypt.withDefaults().hashToString(12, userModel.getPassword().toCharArray());
+        userModel.setPassword(passwordHashred);
+
         var userCreated = this.iuserRepository.save(userModel);
         //retorna uma ststus http de usuário criado e o usuário.
         return ResponseEntity.status(HttpStatus.CREATED).body(userCreated);
